@@ -6,9 +6,22 @@ import contactRouter from './routes/contact.js'
 
 const app = express()
 const PORT = process.env.PORT || 4000
+const IS_PRODUCTION = process.env.NODE_ENV === 'production'
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173').split(',')
+const LOCAL_ORIGIN_RE = /^https?:\/\/(localhost|127\.0\.0\.1):\d+$/
 
-app.use(cors({ origin: ALLOWED_ORIGINS }))
+app.use(
+  cors({
+    origin(origin, callback) {
+      // Non-browser requests (curl, health checks) send no Origin header at all.
+      if (!origin) return callback(null, true)
+      if (ALLOWED_ORIGINS.includes(origin)) return callback(null, true)
+      // In dev, Vite may bump to another port (5174, 5175...) if 5173 is taken.
+      if (!IS_PRODUCTION && LOCAL_ORIGIN_RE.test(origin)) return callback(null, true)
+      callback(new Error(`Origin ${origin} not allowed by CORS`))
+    },
+  }),
+)
 app.use(express.json({ limit: '50kb' }))
 
 const requestLog = new Map()
