@@ -1,8 +1,10 @@
-import 'dotenv/config'
+import dotenv from 'dotenv'
 import express from 'express'
 import cors from 'cors'
 import aiConceptRouter from './routes/aiConcept.js'
 import contactRouter from './routes/contact.js'
+
+dotenv.config({ quiet: true })
 
 const app = express()
 const PORT = process.env.PORT || 4000
