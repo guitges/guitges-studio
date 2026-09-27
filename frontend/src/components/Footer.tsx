@@ -1,71 +1,77 @@
-import { Mail, MessageCircle, Globe, ArrowUpRight } from 'lucide-react'
-import logoIcon from '../assets/guitges-icon.png'
-
-const columns = [
-  {
-    title: 'Studio',
-    links: [
-      { label: 'Services', href: '#services' },
-      { label: 'Example Concepts', href: '#work' },
-      { label: 'Process', href: '#process' },
-      { label: 'Pricing', href: '#pricing' },
-    ],
-  },
-  {
-    title: 'Resources',
-    links: [
-      { label: 'AI Concept Tool', href: '#ai-concept' },
-      { label: 'FAQ', href: '#faq' },
-      { label: 'Contact', href: '#contact' },
-    ],
-  },
-]
+import { useRef, type MouseEvent } from 'react'
+import { ArrowUp } from 'lucide-react'
+import { gsap, useGSAP, SplitText, MOTION_OK, scrollToHash } from '../lib/gsap'
+import { profile, socials } from '../lib/content'
 
 export default function Footer() {
-  return (
-    <footer className="relative border-t border-white/10">
-      <div className="container-px mx-auto max-w-6xl py-14">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.3fr_0.7fr_0.7fr]">
-          <div>
-            <a href="#top" className="flex items-center gap-2.5">
-              <img src={logoIcon} alt="Guitges Studio" className="h-9 w-9" />
-              <span className="font-display text-lg font-semibold tracking-wide text-white">GUITGES</span>
-            </a>
-            <p className="mt-4 max-w-xs text-sm text-slate-500">
-              Technology for tomorrow — modern, professional websites for businesses and individuals.
-            </p>
-            <div className="mt-5 flex gap-3">
-              {[Mail, MessageCircle, Globe, ArrowUpRight].map((Icon, i) => (
-                <a
-                  key={i}
-                  href="#contact"
-                  className="rounded-lg border border-white/10 bg-white/5 p-2 text-slate-400 transition-colors hover:text-white"
-                >
-                  <Icon size={16} />
-                </a>
-              ))}
-            </div>
-          </div>
+  const root = useRef<HTMLElement>(null)
 
-          {columns.map((col) => (
-            <div key={col.title}>
-              <h4 className="text-sm font-semibold text-white">{col.title}</h4>
-              <ul className="mt-4 space-y-2.5">
-                {col.links.map((link) => (
-                  <li key={link.label}>
-                    <a href={link.href} className="text-sm text-slate-500 transition-colors hover:text-slate-200">
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia()
+      mm.add(MOTION_OK, () => {
+        const split = SplitText.create('.footer-word', { type: 'chars' })
+        gsap.from(split.chars, {
+          yPercent: 100,
+          stagger: { each: 0.05, from: 'center' },
+          duration: 1.2,
+          ease: 'bounce.out',
+          scrollTrigger: { trigger: '.footer-word', start: 'top 95%' },
+        })
+
+        // Letters hop when hovered
+        const hop = (e: Event) =>
+          gsap.fromTo(
+            e.currentTarget as HTMLElement,
+            { y: 0 },
+            { y: '-0.12em', duration: 0.25, ease: 'power2.out', yoyo: true, repeat: 1, overwrite: true },
+          )
+        split.chars.forEach((c) => c.addEventListener('pointerenter', hop))
+        return () => {
+          split.chars.forEach((c) => c.removeEventListener('pointerenter', hop))
+          split.revert()
+        }
+      })
+    },
+    { scope: root },
+  )
+
+  function toTop(e: MouseEvent<HTMLAnchorElement>) {
+    e.preventDefault()
+    scrollToHash('#top')
+  }
+
+  return (
+    <footer ref={root} className="relative overflow-hidden rounded-t-[2.5rem] bg-lime text-ink" data-cursor-dark>
+      <div className="container-px pt-12">
+        <div className="flex flex-wrap items-start justify-between gap-8">
+          <div className="flex flex-wrap gap-x-6 gap-y-2 font-display text-lg font-semibold">
+            {socials.map((s) => (
+              <a key={s.label} href={s.href} target="_blank" rel="noreferrer" className="underline-offset-4 hover:underline">
+                {s.label}
+              </a>
+            ))}
+          </div>
+          <a
+            href="#top"
+            onClick={toTop}
+            className="flex h-14 w-14 items-center justify-center rounded-full bg-ink text-cream transition-transform hover:-translate-y-1"
+            aria-label="Back to top"
+            data-cursor="Up"
+          >
+            <ArrowUp size={22} />
+          </a>
         </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-8 text-xs text-slate-600 sm:flex-row">
-          <p>© {new Date().getFullYear()} Guitges Studio. All rights reserved.</p>
-          <p>Designed & built by Guitges Studio.</p>
+        <p className="footer-word mt-10 select-none text-center font-display text-[clamp(4rem,22vw,22rem)] font-extrabold leading-[0.85] tracking-[-0.06em] pb-[0.14em]">
+          {profile.handle}
+        </p>
+
+        <div className="flex flex-wrap justify-between gap-2 border-t border-ink/20 py-5 font-mono text-xs uppercase tracking-widest">
+          <span>
+            © {new Date().getFullYear()} {profile.name}
+          </span>
+          <span>Built with React & GSAP</span>
         </div>
       </div>
     </footer>

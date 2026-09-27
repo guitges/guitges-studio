@@ -6,7 +6,7 @@ const router = Router()
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions'
 const GROQ_MODEL = 'llama-3.1-8b-instant'
 
-const SYSTEM_PROMPT = `You are a website strategist at a web design studio called Guitges Studio.
+const SYSTEM_PROMPT = `You are a website strategist at a web design studio called Guitges.
 Given a business name, a short description, and a site type, respond with ONLY a JSON object
 (no markdown, no commentary) with this exact shape:
 {
@@ -15,7 +15,7 @@ Given a business name, a short description, and a site type, respond with ONLY a
   "sections": string[] (4-6 short homepage section ideas, e.g. "Hero with strong headline"),
   "colorMood": string (2-3 word description of a fitting color mood, e.g. "Warm & Inviting"),
   "colorHex": string[] (exactly 3 hex color codes that match the colorMood),
-  "nextStep": string (one encouraging sentence inviting them to turn this into a real site with Guitges Studio)
+  "nextStep": string (one encouraging sentence inviting them to turn this into a real site with Guitges)
 }`
 
 async function callGroq({ business, description, type }) {

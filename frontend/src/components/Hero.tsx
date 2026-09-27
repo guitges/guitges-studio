@@ -1,108 +1,140 @@
-import { motion } from 'framer-motion'
-import { ArrowRight, MonitorSmartphone, Sparkles } from 'lucide-react'
-import GradientBackdrop from './GradientBackdrop'
-import logoFull from '../assets/guitges-icon.png'
+import { useEffect, useRef, type MouseEvent } from 'react'
+import { ArrowDown, ArrowUpRight } from 'lucide-react'
+import { gsap, useGSAP, SplitText, MOTION_OK, scrollToHash } from '../lib/gsap'
+import { profile, whatsappLink } from '../lib/content'
+import { Star, Flower, Blob, Ring, Squiggle, Plus } from './Shapes'
+import Magnetic from './Magnetic'
 
-export default function Hero() {
+const floaters = [
+  { Shape: Flower, cls: 'left-[4%] top-[18%] h-16 w-16 text-tangerine sm:h-24 sm:w-24', depth: 40 },
+  { Shape: Ring, cls: 'right-[6%] top-[14%] h-14 w-14 text-sky sm:h-20 sm:w-20', depth: -30 },
+  { Shape: Plus, cls: 'right-[18%] bottom-[22%] h-10 w-10 text-bubblegum sm:h-14 sm:w-14', depth: 55 },
+  { Shape: Blob, cls: 'hidden md:block left-[50%] bottom-[20%] h-20 w-20 text-lilac', depth: -45 },
+  { Shape: Squiggle, cls: 'left-[46%] top-[10%] h-8 w-24 text-lemon sm:h-10 sm:w-32', depth: 25 },
+]
+
+export default function Hero({ ready }: { ready: boolean }) {
+  const root = useRef<HTMLElement>(null)
+  const intro = useRef<gsap.core.Timeline | null>(null)
+
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia()
+      mm.add(MOTION_OK, () => {
+        const split = SplitText.create('.hero-line', { type: 'chars', mask: 'lines', linesClass: 'split-line' })
+
+        intro.current = gsap
+          .timeline({ paused: true, defaults: { ease: 'expo.out' } })
+          .from(split.chars, { yPercent: 120, rotate: 12, duration: 1.2, stagger: 0.025 })
+          .from('.hero-inline', { scale: 0, rotate: -180, duration: 1, ease: 'back.out(2)', stagger: 0.1 }, 0.4)
+          .from('.hero-floater', { scale: 0, autoAlpha: 0, duration: 1, ease: 'elastic.out(1, 0.5)', stagger: 0.08 }, 0.5)
+          .from('.hero-fade', { y: 30, autoAlpha: 0, duration: 1, stagger: 0.1 }, 0.7)
+
+        // Slow idle spin on the inline shapes
+        gsap.to('.hero-inline', { rotate: '+=360', duration: 12, ease: 'none', repeat: -1 })
+
+        // Scroll away: headline lifts and fades, floaters scatter at different speeds
+        gsap.to('.hero-title', {
+          yPercent: -25,
+          autoAlpha: 0.2,
+          ease: 'none',
+          scrollTrigger: { trigger: root.current, start: 'top top', end: 'bottom top', scrub: true },
+        })
+        gsap.utils.toArray<HTMLElement>('.hero-floater').forEach((el, i) => {
+          gsap.to(el, {
+            y: -200 - i * 80,
+            rotate: i % 2 ? 180 : -180,
+            ease: 'none',
+            scrollTrigger: { trigger: root.current, start: 'top top', end: 'bottom top', scrub: 1 },
+          })
+        })
+
+        // Pointer parallax on the floaters
+        const movers = gsap.utils.toArray<HTMLElement>('.hero-floater-inner').map((el) => ({
+          x: gsap.quickTo(el, 'x', { duration: 1, ease: 'power3' }),
+          y: gsap.quickTo(el, 'y', { duration: 1, ease: 'power3' }),
+          depth: Number(el.dataset.depth),
+        }))
+        const onMove = (e: PointerEvent) => {
+          const nx = e.clientX / window.innerWidth - 0.5
+          const ny = e.clientY / window.innerHeight - 0.5
+          movers.forEach((m) => {
+            m.x(nx * m.depth)
+            m.y(ny * m.depth)
+          })
+        }
+        window.addEventListener('pointermove', onMove)
+        return () => {
+          window.removeEventListener('pointermove', onMove)
+          split.revert()
+        }
+      })
+    },
+    { scope: root },
+  )
+
+  useEffect(() => {
+    if (ready) intro.current?.play()
+  }, [ready])
+
+  function go(e: MouseEvent<HTMLAnchorElement>, href: string) {
+    e.preventDefault()
+    scrollToHash(href)
+  }
+
   return (
-    <section id="top" className="relative overflow-hidden pb-24 pt-40 sm:pt-48">
-      <GradientBackdrop variant="top" />
+    <section ref={root} id="top" className="relative flex min-h-[100svh] flex-col overflow-hidden pb-8 pt-28 sm:pt-32">
+      {floaters.map(({ Shape, cls, depth }, i) => (
+        <div key={i} className={`hero-floater pointer-events-none absolute ${cls}`}>
+          <div className="hero-floater-inner h-full w-full" data-depth={depth}>
+            <Shape className="h-full w-full" />
+          </div>
+        </div>
+      ))}
 
-      <div className="container-px relative mx-auto max-w-6xl">
-        <div className="grid items-center gap-16 lg:grid-cols-[1.1fr_0.9fr]">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: 'easeOut' }}
-          >
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-cyan-300">
-              <Sparkles size={14} />
-              Websites built for people & business
-            </span>
+      <div className="container-px relative flex flex-1 flex-col">
+        <p className="hero-fade eyebrow">
+          {profile.available && <span className="h-2 w-2 animate-pulse rounded-full bg-lime" />}
+          {profile.available ? 'Available for new projects' : profile.role}
+        </p>
 
-            <h1 className="mt-6 text-4xl font-semibold leading-[1.1] text-white sm:text-5xl lg:text-6xl">
-              A modern website that makes people want to{' '}
-              <span className="text-gradient">work with you.</span>
-            </h1>
+        <h1 className="hero-title my-auto py-10 font-display text-mega font-extrabold">
+          <span className="hero-line block">
+            Hi, I’m <span className="text-lime">Guitges</span>
+          </span>
+          <span className="flex flex-wrap items-center gap-x-[0.2em]">
+            <span className="hero-line">I build</span>
+            <Star className="hero-inline inline-block h-[0.7em] w-[0.7em] text-bubblegum" />
+            <span className="hero-line">websites</span>
+          </span>
+          <span className="flex flex-wrap items-center gap-x-[0.2em]">
+            <span className="hero-line">for your</span>
+            <span className="hero-line italic text-lilac">business.</span>
+          </span>
+        </h1>
 
-            <p className="mt-6 max-w-xl text-lg text-slate-400">
-              Guitges Studio designs and builds fast, beautiful, mobile-friendly websites for
-              businesses and individuals — from first sketch to a live site your customers love,
-              usually in under two weeks.
-            </p>
-
-            <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-              <a href="#contact" className="btn-primary">
-                Start Your Website
-                <ArrowRight size={18} />
+        <div className="grid items-end gap-8 md:grid-cols-[1fr_auto]">
+          <p className="hero-fade max-w-md text-lg text-cream-muted">{profile.intro}</p>
+          <div className="hero-fade flex flex-wrap items-center gap-3">
+            <Magnetic>
+              <a href="#work" onClick={(e) => go(e, '#work')} className="pill-lime" data-cursor="Go">
+                See my work <ArrowUpRight size={18} />
               </a>
-              <a href="#ai-concept" className="btn-secondary">
-                <MonitorSmartphone size={18} />
-                Try the Free AI Concept Tool
+            </Magnetic>
+            <Magnetic>
+              <a href={whatsappLink('Hi Guitges!')} target="_blank" rel="noreferrer" className="pill-ghost">
+                WhatsApp me
               </a>
-            </div>
+            </Magnetic>
+          </div>
+        </div>
 
-            <div className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-3 text-sm text-slate-500">
-              <span>✓ Flat, transparent pricing</span>
-              <span>✓ Launch in 5–10 days</span>
-              <span>✓ Built with React</span>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.92 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, ease: 'easeOut', delay: 0.15 }}
-            className="relative mx-auto w-full max-w-md"
-          >
-            <div className="absolute inset-0 -z-10 rounded-[2.5rem] bg-brand-gradient opacity-20 blur-3xl" />
-            <div className="card relative overflow-hidden p-6 shadow-2xl shadow-black/40">
-              <div className="flex items-center gap-1.5 border-b border-white/10 pb-4">
-                <span className="h-2.5 w-2.5 rounded-full bg-red-400/70" />
-                <span className="h-2.5 w-2.5 rounded-full bg-amber-300/70" />
-                <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/70" />
-                <span className="ml-4 truncate rounded-md bg-white/5 px-3 py-1 text-xs text-slate-400">
-                  yourbusiness.com
-                </span>
-              </div>
-
-              <div className="flex flex-col items-center py-10">
-                <img
-                  src={logoFull}
-                  alt="Guitges Studio mark"
-                  className="h-24 w-24 animate-float drop-shadow-[0_0_35px_rgba(109,140,245,0.45)]"
-                />
-                <div className="mt-6 h-2.5 w-40 rounded-full bg-gradient-to-r from-cyan-400/60 to-violet-500/60" />
-                <div className="mt-3 h-2 w-28 rounded-full bg-white/10" />
-              </div>
-
-              <div className="grid grid-cols-3 gap-3">
-                {['Home', 'Services', 'Contact'].map((label) => (
-                  <div
-                    key={label}
-                    className="rounded-lg border border-white/10 bg-white/[0.02] py-2.5 text-center text-xs text-slate-400"
-                  >
-                    {label}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <motion.div
-              animate={{ y: [0, -10, 0] }}
-              transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-              className="card absolute -right-6 -top-6 flex items-center gap-2 px-4 py-2.5 text-xs font-medium text-emerald-300 shadow-lg"
-            >
-              ● Site live in 7 days
-            </motion.div>
-            <motion.div
-              animate={{ y: [0, 10, 0] }}
-              transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-              className="card absolute -bottom-6 -left-6 px-4 py-2.5 text-xs font-medium text-slate-300 shadow-lg"
-            >
-              📱 100% mobile-friendly
-            </motion.div>
-          </motion.div>
+        <div className="hero-fade mt-10 flex items-center justify-between border-t border-cream/10 pt-4 font-mono text-xs uppercase tracking-[0.2em] text-cream-dim">
+          <span>{profile.name}</span>
+          <span className="flex items-center gap-2">
+            Scroll <ArrowDown size={14} className="animate-bounce" />
+          </span>
+          <span className="hidden sm:inline">{profile.role}</span>
         </div>
       </div>
     </section>

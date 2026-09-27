@@ -2,15 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-  scroll-behavior: smooth;
-}
-
 body {
-  @apply bg-ink-950 text-slate-200 font-sans antialiased;
+  @apply bg-ink font-sans text-cream antialiased;
   margin: 0;
   min-width: 320px;
-  min-height: 100vh;
 }
 
 h1, h2, h3, h4 {
@@ -18,43 +13,63 @@ h1, h2, h3, h4 {
 }
 
 ::selection {
-  @apply bg-violet-500/40 text-white;
-}
-
-.text-gradient {
-  @apply bg-brand-gradient bg-clip-text text-transparent;
+  @apply bg-lime text-ink;
 }
 
 .container-px {
-  @apply px-6 sm:px-8 lg:px-12;
+  @apply mx-auto w-full max-w-[1400px] px-4 sm:px-8 lg:px-12;
 }
 
-.section {
-  @apply py-20 sm:py-28;
+.eyebrow {
+  @apply inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.2em] text-cream-muted;
 }
 
-.btn-primary {
-  @apply inline-flex items-center justify-center gap-2 rounded-full bg-brand-gradient px-6 py-3.5 font-display font-semibold text-ink-950 shadow-glow transition-transform duration-200 hover:scale-[1.03] active:scale-[0.98];
+.pill {
+  @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 font-display text-base font-semibold transition-colors duration-200;
 }
 
-.btn-secondary {
-  @apply inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3.5 font-display font-semibold text-slate-100 backdrop-blur transition-colors duration-200 hover:border-white/30 hover:bg-white/10;
+.pill-lime {
+  @apply pill bg-lime text-ink hover:bg-cream;
 }
 
-.card {
-  @apply rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm;
+.pill-ghost {
+  @apply pill border border-cream/20 text-cream hover:border-cream hover:bg-cream hover:text-ink;
+}
+
+.field {
+  @apply w-full rounded-2xl border border-cream/15 bg-ink-800 px-4 py-3.5 text-base text-cream placeholder:text-cream-dim focus:border-lime focus:outline-none focus:ring-2 focus:ring-lime/25;
+}
+
+/* Custom cursor only on devices with a fine pointer */
+@media (hover: hover) and (pointer: fine) {
+  .has-cursor,
+  .has-cursor a,
+  .has-cursor button {
+    cursor: none;
+  }
+}
+
+/* SplitText masks clip overflow; pad them so descenders (y, q, g) aren't cut off */
+.split-line-mask,
+.split-char-mask {
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 ::-webkit-scrollbar {
   width: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: #05070d;
+  background: #0e100f;
 }
 ::-webkit-scrollbar-thumb {
-  background: #23283b;
+  background: #2a2d2b;
   border-radius: 999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #323a56;
 }

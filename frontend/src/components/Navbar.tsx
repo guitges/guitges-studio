@@ -1,88 +1,124 @@
-import { useEffect, useState } from 'react'
-import { Menu, X } from 'lucide-react'
+import { useRef, useState, type MouseEvent } from 'react'
+import { gsap, useGSAP, ScrollTrigger, scrollToHash } from '../lib/gsap'
+import { profile, socials } from '../lib/content'
 import logoIcon from '../assets/guitges-icon.png'
+import Magnetic from './Magnetic'
 
 const links = [
-  { label: 'Services', href: '#services' },
   { label: 'Work', href: '#work' },
-  { label: 'Process', href: '#process' },
+  { label: 'Services', href: '#services' },
   { label: 'Pricing', href: '#pricing' },
-  { label: 'FAQ', href: '#faq' },
+  { label: 'About', href: '#about' },
+  { label: 'Contact', href: '#contact' },
 ]
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false)
+  const header = useRef<HTMLElement>(null)
+  const menu = useRef<HTMLDivElement>(null)
+  const menuTl = useRef<gsap.core.Timeline | null>(null)
   const [open, setOpen] = useState(false)
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12)
-    onScroll()
-    window.addEventListener('scroll', onScroll)
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+  useGSAP(() => {
+    // Hide on scroll down, reveal on scroll up
+    const hide = gsap.to(header.current, { yPercent: -120, duration: 0.35, ease: 'power2.out', paused: true })
+    ScrollTrigger.create({
+      start: 'top -120',
+      end: 'max',
+      onUpdate: (self) => (self.direction === 1 ? hide.play() : hide.reverse()),
+    })
+
+    menuTl.current = gsap
+      .timeline({ paused: true })
+      .set(menu.current, { display: 'flex' })
+      .fromTo(menu.current, { clipPath: 'circle(0% at 100% 0%)' }, { clipPath: 'circle(150% at 100% 0%)', duration: 0.7, ease: 'power3.inOut' })
+      .from('.menu-link', { yPercent: 110, rotate: 4, stagger: 0.06, duration: 0.6, ease: 'power3.out' }, '-=0.3')
+  })
+
+  function toggle(next = !open) {
+    setOpen(next)
+    if (next) menuTl.current?.timeScale(1).play()
+    else menuTl.current?.timeScale(1.6).reverse()
+  }
+
+  function go(e: MouseEvent<HTMLAnchorElement>, href: string) {
+    e.preventDefault()
+    toggle(false)
+    scrollToHash(href)
+  }
 
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
-        scrolled ? 'border-b border-white/10 bg-ink-950/80 backdrop-blur-lg' : 'bg-transparent'
-      }`}
-    >
-      <nav className="container-px mx-auto flex h-18 max-w-7xl items-center justify-between py-4">
-        <a href="#top" className="flex items-center gap-2.5">
-          <img src={logoIcon} alt="Guitges Studio" className="h-9 w-9" />
-          <span className="font-display text-lg font-semibold tracking-wide text-white">GUITGES</span>
-        </a>
+    <>
+      <header ref={header} className="fixed inset-x-0 top-0 z-50">
+        <nav className="container-px flex items-center justify-between py-4">
+          <a href="#top" onClick={(e) => go(e, '#top')} className="flex items-center gap-2.5" aria-label="Back to top">
+            <img src={logoIcon} alt="" className="h-9 w-9" />
+            <span className="font-display text-xl font-bold tracking-tight">{profile.handle}</span>
+          </a>
 
-        <div className="hidden items-center gap-8 md:flex">
-          {links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="text-sm font-medium text-slate-300 transition-colors hover:text-white"
+          <div className="hidden items-center gap-1 rounded-full border border-cream/10 bg-ink/70 p-1.5 backdrop-blur-md md:flex">
+            {links.map((l) => (
+              <a
+                key={l.href}
+                href={l.href}
+                onClick={(e) => go(e, l.href)}
+                className="rounded-full px-4 py-2 text-sm font-medium text-cream-muted transition-colors hover:bg-cream hover:text-ink"
+              >
+                {l.label}
+              </a>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="hidden md:block">
+              <Magnetic>
+                <a href="#contact" onClick={(e) => go(e, '#contact')} className="pill-lime !px-5 !py-2.5 text-sm">
+                  Let’s talk
+                </a>
+              </Magnetic>
+            </div>
+            <button
+              onClick={() => toggle()}
+              aria-expanded={open}
+              aria-label={open ? 'Close menu' : 'Open menu'}
+              className="relative z-[60] flex h-11 w-11 flex-col items-center justify-center gap-1.5 rounded-full bg-cream md:hidden"
             >
-              {link.label}
+              <span
+                className={`h-0.5 w-5 bg-ink transition-transform duration-300 ${open ? 'translate-y-1 rotate-45' : ''}`}
+              />
+              <span
+                className={`h-0.5 w-5 bg-ink transition-transform duration-300 ${open ? '-translate-y-1 -rotate-45' : ''}`}
+              />
+            </button>
+          </div>
+        </nav>
+      </header>
+
+      <div
+        ref={menu}
+        className="fixed inset-0 z-40 hidden flex-col justify-between bg-lilac px-4 pb-8 pt-24 text-ink md:hidden"
+      >
+        <ul className="space-y-1">
+          {links.map((l, i) => (
+            <li key={l.href} className="overflow-hidden">
+              <a
+                href={l.href}
+                onClick={(e) => go(e, l.href)}
+                className="menu-link flex items-baseline gap-3 font-display text-6xl font-extrabold tracking-tight"
+              >
+                <span className="font-mono text-sm font-normal">0{i + 1}</span>
+                {l.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <div className="flex flex-wrap gap-x-5 gap-y-2 font-mono text-sm">
+          {socials.map((s) => (
+            <a key={s.label} href={s.href} target="_blank" rel="noreferrer" className="underline underline-offset-4">
+              {s.label}
             </a>
           ))}
         </div>
-
-        <div className="hidden md:block">
-          <a href="#contact" className="btn-primary !px-5 !py-2.5 text-sm">
-            Get a Quote
-          </a>
-        </div>
-
-        <button
-          onClick={() => setOpen((v) => !v)}
-          className="rounded-lg border border-white/10 p-2 text-slate-200 md:hidden"
-          aria-label="Toggle menu"
-        >
-          {open ? <X size={20} /> : <Menu size={20} />}
-        </button>
-      </nav>
-
-      {open && (
-        <div className="border-t border-white/10 bg-ink-950/95 px-6 pb-6 pt-2 backdrop-blur-lg md:hidden">
-          <div className="flex flex-col gap-1">
-            {links.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={() => setOpen(false)}
-                className="rounded-lg px-3 py-3 text-base font-medium text-slate-200 hover:bg-white/5"
-              >
-                {link.label}
-              </a>
-            ))}
-            <a
-              href="#contact"
-              onClick={() => setOpen(false)}
-              className="btn-primary mt-3 w-full text-sm"
-            >
-              Get a Quote
-            </a>
-          </div>
-        </div>
-      )}
-    </header>
+      </div>
+    </>
   )
 }

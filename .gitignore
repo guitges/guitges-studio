@@ -6,5 +6,8 @@ build/
 .env.*.local
 *.log
 backend/data/submissions.json
+frontend/.vercel
 .DS_Store
 Thumbs.db
+backend/data/projects.json
+backend/data/screenshots/

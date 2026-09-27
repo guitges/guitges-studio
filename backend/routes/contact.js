@@ -58,7 +58,7 @@ router.post('/', async (req, res) => {
         from: process.env.SMTP_USER,
         to: process.env.CONTACT_TO_EMAIL,
         replyTo: entry.email,
-        subject: `New inquiry from ${entry.name} — Guitges Studio`,
+        subject: `New inquiry from ${entry.name} — Guitges`,
         text: `Name: ${entry.name}\nEmail: ${entry.email}\nBusiness: ${entry.business}\nPackage: ${entry.package}\n\n${entry.message}`,
       })
     }

@@ -1,7 +1,7 @@
 {
   "name": "guitges-backend",
   "version": "1.0.0",
-  "description": "API server for Guitges Studio (contact form + AI concept tool)",
+  "description": "API server for Guitges (contact form + AI concept tool)",
   "main": "server.js",
   "type": "module",
   "scripts": {

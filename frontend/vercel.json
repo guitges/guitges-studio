@@ -1,0 +1,7 @@
+{
+  "regions": ["sin1"],
+  "rewrites": [{ "source": "/admin", "destination": "/index.html" }],
+  "functions": {
+    "api/**/*.ts": { "maxDuration": 60 }
+  }
+}

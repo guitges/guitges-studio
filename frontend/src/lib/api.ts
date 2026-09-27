@@ -1,45 +1,59 @@
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000'
+// In production the API is served by Vercel Functions on the same domain (/api/...)
+export const API_BASE = import.meta.env.VITE_API_URL || ''
 
-export interface ConceptRequest {
-  business: string
+export interface Project {
+  id: string
+  title: string
+  category: string
+  year: string
   description: string
-  type: string
+  tags: string[]
+  url: string
+  /** URL of the first-screen preview — null if capturing failed */
+  image: string | null
 }
 
-export interface ConceptResponse {
-  tagline: string
-  pages: string[]
-  sections: string[]
-  colorMood: string
-  colorHex: string[]
-  nextStep: string
-  source: 'ai' | 'template'
+export type ProjectInput = Pick<Project, 'title' | 'category' | 'year' | 'description' | 'url'> & { tags: string }
+
+export function imageUrl(p: Project) {
+  if (!p.image) return null
+  return /^https?:\/\//.test(p.image) ? p.image : `${API_BASE}${p.image}`
 }
 
-export async function generateConcept(payload: ConceptRequest): Promise<ConceptResponse> {
-  const res = await fetch(`${API_BASE}/api/ai-concept`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
+async function request<T>(path: string, init: RequestInit = {}, password?: string): Promise<T> {
+  const res = await fetch(`${API_BASE}${path}`, {
+    ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(password ? { Authorization: `Bearer ${password}` } : {}),
+      ...init.headers,
+    },
   })
-  if (!res.ok) throw new Error('Failed to generate concept')
-  return res.json()
+  const body = await res.json().catch(() => ({}))
+  if (!res.ok) throw new Error(body.error || `Request failed (${res.status})`)
+  return body as T
 }
 
-export interface ContactPayload {
-  name: string
-  email: string
-  business?: string
-  package?: string
-  message: string
-}
+/** `fresh` skips the short edge cache (used by the admin right after edits) */
+export const fetchProjects = (fresh = false) => request<Project[]>(`/api/projects${fresh ? `?t=${Date.now()}` : ''}`)
 
-export async function sendContact(payload: ContactPayload): Promise<{ ok: boolean }> {
-  const res = await fetch(`${API_BASE}/api/contact`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  })
-  if (!res.ok) throw new Error('Failed to send message')
-  return res.json()
+export const admin = {
+  login: (pw: string) => request<{ ok: boolean }>('/api/admin/login', { method: 'POST' }, pw),
+  create: (pw: string, data: ProjectInput) =>
+    request<{ project: Project; screenshotError: string | null }>(
+      '/api/admin/projects',
+      { method: 'POST', body: JSON.stringify(data) },
+      pw,
+    ),
+  update: (pw: string, id: string, data: ProjectInput) =>
+    request<{ project: Project; screenshotError: string | null }>(
+      `/api/admin/projects/${id}`,
+      { method: 'PUT', body: JSON.stringify(data) },
+      pw,
+    ),
+  refreshScreenshot: (pw: string, id: string) =>
+    request<{ project: Project }>(`/api/admin/projects/${id}/screenshot`, { method: 'POST' }, pw),
+  reorder: (pw: string, ids: string[]) =>
+    request<Project[]>('/api/admin/projects/reorder', { method: 'POST', body: JSON.stringify({ ids }) }, pw),
+  remove: (pw: string, id: string) => request<{ ok: boolean }>(`/api/admin/projects/${id}`, { method: 'DELETE' }, pw),
 }

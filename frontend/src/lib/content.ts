@@ -1,167 +1,123 @@
-export const services = [
-  {
-    title: 'Business Websites',
-    description: 'A polished, credible online home for your company — built to turn visitors into customers.',
-    icon: 'Building2',
-  },
-  {
-    title: 'Personal & Portfolio Sites',
-    description: 'Stand out from the crowd with a site that tells your story and showcases your work.',
-    icon: 'UserRound',
-  },
+// All the copy for the portfolio lives here — edit this file to make the site yours.
+
+export const profile = {
+  name: 'Ahmad Baihaqi',
+  handle: 'guitges',
+  role: 'Websites for businesses',
+  intro:
+    'Simple, fast websites that help customers find you and contact you — from a one-page site (a landing page) to a full company website. One flat price, pay once.',
+  about:
+    "I'm a web designer and developer who keeps things simple: a clear message, a layout that guides people to act, and a site that loads fast on every phone. You pay once, I build it, launch it, and hand it over — no monthly subscriptions, no lock-in. From small businesses to personal brands, I take projects from first sketch to live site.",
+  available: true,
+}
+
+// WhatsApp is the only way to get in touch
+export const whatsapp = {
+  number: '60198681534', // international format, no + or spaces
+  display: '019-868 1534',
+}
+
+export function whatsappLink(message?: string) {
+  return `https://wa.me/${whatsapp.number}${message ? `?text=${encodeURIComponent(message)}` : ''}`
+}
+
+export const socials = [{ label: `WhatsApp · ${whatsapp.display}`, href: whatsappLink() }]
+
+export const stats = [
+  { value: '5–10', label: 'days from kickoff to launch' },
+  { value: 'RM699', label: 'one-time, for a landing page' },
+  { value: '100%', label: 'mobile-first, every build' },
+]
+
+export const skills = [
+  'Landing Pages',
+  'Company Profiles',
+  'Informational Sites',
+  'Mobile-First',
+  'SEO Basics',
+  'Contact Forms',
+  'Fast Loading',
+  'One-Time Price',
+  'React',
+  'Tailwind CSS',
+  'Figma',
+  'Easy Handover',
+]
+
+export type Accent = 'lime' | 'lilac' | 'tangerine' | 'bubblegum' | 'sky' | 'lemon'
+
+// Previous work is managed from the /admin page and loaded from the backend.
+
+export const services: { title: string; description: string; points: string[]; accent: Accent }[] = [
   {
     title: 'Landing Pages',
-    description: 'Focused, high-converting single pages for launches, campaigns, or lead generation.',
-    icon: 'Rocket',
+    description: 'One focused page built to do one job — get sign-ups, bookings, orders or calls.',
+    points: ['Clear headline & call to action', 'Mobile-first layout', 'Contact or sign-up form'],
+    accent: 'lime',
   },
   {
-    title: 'Online Stores',
-    description: 'Simple, secure storefronts so you can start selling products or services in days.',
-    icon: 'ShoppingBag',
+    title: 'Informational Websites',
+    description: 'A simple, credible home for your business: who you are, what you offer, how to reach you.',
+    points: ['Multiple pages', 'Company profile, services, contact', 'Custom quote — just ask'],
+    accent: 'lilac',
   },
   {
-    title: 'Redesigns & Revamps',
-    description: 'Bring an outdated site into the modern era without losing your existing content or SEO.',
-    icon: 'Sparkles',
-  },
-  {
-    title: 'Care & Maintenance',
-    description: 'Ongoing updates, hosting support, and small changes so your site keeps running smoothly.',
-    icon: 'ShieldCheck',
+    title: 'Launch & Handover',
+    description: 'I put it online and hand you the keys. Pay once — the site is yours.',
+    points: ['Domain & hosting setup', 'Analytics installed', 'Short guide to update your content'],
+    accent: 'tangerine',
   },
 ]
 
-export const whyUs = [
-  { title: 'Fast turnaround', description: 'Most sites launch in 5–10 business days, not months.', icon: 'Zap' },
-  { title: 'Mobile-first design', description: 'Every layout is built and tested for phones first.', icon: 'Smartphone' },
-  { title: 'Modern tech stack', description: 'React-powered sites that are fast, secure, and easy to extend.', icon: 'Cpu' },
-  { title: 'SEO foundations', description: 'Clean structure and metadata so search engines can find you.', icon: 'Search' },
-  { title: 'Transparent pricing', description: 'One flat quote up front. No surprise invoices later.', icon: 'Wallet' },
-  { title: 'Real support', description: 'Direct access to the person who actually builds your site.', icon: 'MessageCircle' },
-]
-
-export const process = [
+export const pricing: {
+  name: string
+  price: string
+  priceNote: string
+  description: string
+  features: string[]
+  cta: string
+  message: string
+  highlight?: boolean
+}[] = [
   {
-    step: '01',
-    title: 'Discover',
-    description: 'A short call or form about your business, goals, and style so we understand what you need.',
-  },
-  {
-    step: '02',
-    title: 'Design',
-    description: 'We craft a custom look and structure around your brand — you review and give feedback.',
-  },
-  {
-    step: '03',
-    title: 'Develop',
-    description: 'We build it with React for a fast, responsive, production-ready site.',
-  },
-  {
-    step: '04',
-    title: 'Launch',
-    description: 'We deploy, connect your domain, and hand over a site that just works — on any device.',
-  },
-]
-
-export const portfolioExamples = [
-  {
-    label: 'Example Concept',
-    name: 'Café / Restaurant',
-    tagline: 'Warm, appetite-driven design with menu & booking front and center',
-    accent: 'from-amber-400 to-rose-500',
-  },
-  {
-    label: 'Example Concept',
-    name: 'Consulting / Professional',
-    tagline: 'Confident, minimal layout that builds instant credibility',
-    accent: 'from-cyan-400 to-blue-600',
-  },
-  {
-    label: 'Example Concept',
-    name: 'Personal Portfolio',
-    tagline: 'Bold typography that puts your work and story in the spotlight',
-    accent: 'from-violet-500 to-fuchsia-500',
-  },
-  {
-    label: 'Example Concept',
-    name: 'Boutique / E-commerce',
-    tagline: 'Product-first grid built to make browsing feel effortless',
-    accent: 'from-emerald-400 to-teal-600',
-  },
-]
-
-export const pricing = [
-  {
-    name: 'Starter',
-    price: '$249',
-    cadence: 'one-time',
-    description: 'A focused single page to get you online fast.',
+    name: 'Landing Page',
+    price: 'RM699',
+    priceNote: 'one-time payment',
+    description: 'A single focused page that gets your business online, fast.',
     features: [
       '1-page responsive website',
       'Mobile-first design',
-      'Contact form',
+      'WhatsApp or contact button',
       'Basic SEO setup',
-      '1 round of revisions',
+      'Domain & hosting setup help',
       '5-day delivery',
     ],
-    highlight: false,
-  },
-  {
-    name: 'Business',
-    price: '$599',
-    cadence: 'one-time',
-    description: 'A complete site to represent your business online.',
-    features: [
-      'Up to 5 pages',
-      'Custom design for your brand',
-      'Contact & booking forms',
-      'On-page SEO + analytics setup',
-      '3 rounds of revisions',
-      '10-day delivery',
-      '30 days of free support',
-    ],
+    cta: 'Get started',
+    message: 'Hi Guitges! I’m interested in the Landing Page package (RM699).',
     highlight: true,
   },
   {
-    name: 'Premium',
-    price: '$1,199',
-    cadence: 'one-time',
-    description: 'For businesses that need more pages, power, and polish.',
-    features: [
-      'Up to 10 pages or store front',
-      'Advanced animations & interactions',
-      'CMS so you can edit content yourself',
-      'Full SEO & performance optimization',
-      'Unlimited revisions during build',
-      '90 days of free support',
-    ],
-    highlight: false,
+    name: 'Custom',
+    price: 'Let’s talk',
+    priceNote: 'custom quote',
+    description: 'More pages, an informational website, or something specific in mind? Message me and I’ll quote a flat price.',
+    features: ['Multi-page informational sites', 'Tailored to your scope', 'Still a one-time price', 'No obligation quote'],
+    cta: 'Contact me',
+    message: 'Hi Guitges! I’d like a custom quote for a website.',
   },
 ]
 
-export const faqs = [
-  {
-    q: 'How long does it take to build my website?',
-    a: 'Most single-page sites launch within 5 business days, and full business sites within 7–10 business days after we finalize your content and design direction.',
-  },
-  {
-    q: 'Do I need to provide my own content and images?',
-    a: 'Not necessarily. Send us what you have, and we’ll help write copy, source licensed imagery, and structure everything — or use our AI concept tool below to get started in seconds.',
-  },
-  {
-    q: 'Will my website work well on phones?',
-    a: 'Yes. Every project is designed mobile-first and tested across phone, tablet, and desktop before launch.',
-  },
-  {
-    q: 'Can I update the website myself later?',
-    a: 'Business and Premium packages include a simple content system so you can edit text and images without touching code. We’re also available for ongoing changes.',
-  },
-  {
-    q: 'What about hosting and my domain name?',
-    a: 'We deploy your site to fast, reliable hosting and help you connect an existing domain or register a new one. Hosting costs are typically $0–15/month depending on your needs.',
-  },
-  {
-    q: 'What if I need something outside these packages?',
-    a: 'Every business is different. Tell us what you have in mind and we’ll put together a custom quote — no obligation.',
-  },
+export const pricingNotes = [
+  'One-time payment — no monthly fees to me.',
+  'Domain & hosting are paid to the provider directly.',
+  'Everything is arranged over WhatsApp.',
 ]
+
+export const accentBg: Record<Accent, string> = {
+  lime: 'bg-lime',
+  lilac: 'bg-lilac',
+  tangerine: 'bg-tangerine',
+  bubblegum: 'bg-bubblegum',
+  sky: 'bg-sky',
+  lemon: 'bg-lemon',
+}
