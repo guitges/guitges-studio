@@ -1,0 +1,605 @@
+/* The admin keeps the old poolroom look; the public site uses src/os/os.css. */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=Syne:wght@400..800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   Poolrooms — white tile, still water, fluorescent quiet.
+   paper #ECEFEC · ink #161E20 · water #2C6A6E
+
+   Type: Syne for anything that should be looked at (wide, heavy, set tight),
+   DM Sans for anything that should be read. No monospace anywhere.
+   Accents inside a heading are not italic: they drop to Syne's lightest weight,
+   so a line reads loud, then quiet.
+   ========================================================================== */
+
+:root {
+  --paper: #eceeeb;
+  --paper-2: #e2e6e3;
+  --ink: #161e20;
+  --ink-soft: #4b5856;
+  --ink-faint: #6e7a78;
+  --line: rgba(22, 30, 32, 0.14);
+  --water: #2c6a6e;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --f-display: 'Syne', 'Arial Black', sans-serif;
+  --f-text: 'DM Sans', system-ui, sans-serif;
+  color-scheme: light;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  overflow-x: clip;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-text);
+  font-size: 1rem;
+  line-height: 1.62;
+  letter-spacing: -0.004em;
+  font-optical-sizing: auto;
+  @apply antialiased;
+}
+
+::selection {
+  background: var(--water);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 1.5px solid currentColor;
+  outline-offset: 4px;
+}
+[tabindex='-1']:focus {
+  outline: none;
+}
+
+@layer components {
+  .frame {
+    @apply mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-8;
+  }
+
+  /* ------------------------------------------------------------ type scale */
+
+  .t-mega,
+  .t-xl,
+  .t-l,
+  .t-m,
+  .t-s,
+  .t-note {
+    font-family: var(--f-display);
+    font-kerning: normal;
+    transition:
+      font-weight 0.5s var(--ease),
+      letter-spacing 0.5s var(--ease);
+  }
+  .t-mega em,
+  .t-xl em,
+  .t-l em,
+  .t-m em,
+  .t-s em,
+  .t-note em {
+    font-style: normal;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+
+  /* one word, the page's name: big, but never the whole screen */
+  .t-mega {
+    font-weight: 800;
+    font-size: clamp(2.9rem, 9vw, 8.5rem);
+    line-height: 0.8;
+    letter-spacing: -0.065em;
+    text-transform: uppercase;
+    margin-left: -0.05em;
+  }
+  /* page titles that are sentences */
+  .t-xl {
+    font-weight: 700;
+    font-size: clamp(2.2rem, 4.6vw, 4.6rem);
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+  }
+  /* section headings */
+  .t-l {
+    font-weight: 700;
+    font-size: clamp(1.8rem, 3.1vw, 3rem);
+    line-height: 0.96;
+    letter-spacing: -0.04em;
+  }
+  /* project names, the things you click */
+  .t-m {
+    font-weight: 700;
+    font-size: clamp(1.4rem, 1.9vw, 1.85rem);
+    line-height: 1;
+    letter-spacing: -0.035em;
+  }
+  /* list items, small titles */
+  .t-s {
+    font-weight: 600;
+    font-size: 1.16rem;
+    line-height: 1.18;
+    letter-spacing: -0.022em;
+  }
+  /* what's written on the notes pinned to the board */
+  .t-note {
+    font-weight: 600;
+    font-size: 1.3rem;
+    line-height: 1.12;
+    letter-spacing: -0.03em;
+  }
+
+  /* the first thing to read on a page: large, light, close-set */
+  .t-lede {
+    font-family: var(--f-text);
+    font-weight: 300;
+    font-size: clamp(1.15rem, 1.6vw, 1.42rem);
+    line-height: 1.34;
+    letter-spacing: -0.022em;
+  }
+  .t-indent {
+    text-indent: 3.5em;
+  }
+
+  /* captions, labels, plate numbers */
+  .cap {
+    font-family: var(--f-text);
+    font-weight: 600;
+    font-size: 0.64rem;
+    line-height: 1.7;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-faint);
+  }
+  /* numbers that count things: 01, 02 … */
+  .num {
+    font-family: var(--f-display);
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.01em;
+    font-variant-numeric: tabular-nums;
+    text-transform: none;
+  }
+  .cap .num {
+    color: var(--ink);
+    font-size: 0.74rem;
+  }
+
+  /* set sideways along the edge of the picture */
+  .t-vert {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    letter-spacing: 0.32em;
+  }
+
+  /* ------------------------------------------------------------ UI */
+
+  .btn {
+    @apply inline-flex items-center gap-3 border border-current px-6 py-3.5 transition-colors duration-300;
+    font-family: var(--f-text);
+    font-weight: 700;
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    border-radius: 999px;
+  }
+  .btn:hover {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+  .btn-light {
+    @apply border-white/80 text-white;
+  }
+  .btn-light:hover {
+    background: #fff;
+    border-color: #fff;
+    color: var(--ink);
+  }
+
+  .text-link {
+    @apply underline decoration-1 underline-offset-[5px] transition-colors duration-300;
+    font-weight: 500;
+    text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+  }
+  .text-link:hover {
+    text-decoration-color: currentColor;
+  }
+
+  .title-link {
+    background: linear-gradient(currentColor, currentColor) 0 100% / 0 2px no-repeat;
+    transition: background-size 0.6s var(--ease);
+  }
+  .title-link:hover {
+    background-size: 100% 2px;
+  }
+
+  .chip {
+    @apply rounded-full border border-line px-3.5 py-1;
+    font-weight: 500;
+    font-size: 0.82rem;
+    letter-spacing: -0.005em;
+  }
+
+  /* kept for /admin */
+  .sys {
+    @apply text-[0.66rem] font-semibold uppercase tracking-[0.2em] text-ink-faint;
+  }
+  .link-sys {
+    @apply inline-flex items-center gap-2 rounded-full border border-ink/25 bg-white/50 px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.16em] text-ink transition duration-500 hover:border-ink/60 hover:bg-white/80;
+  }
+  .field-dream {
+    @apply w-full rounded-lg border border-ink/20 bg-white/70 px-3.5 py-2.5 text-[0.95rem] text-ink placeholder:text-ink-faint focus:border-ink/60 focus:bg-white focus:outline-none;
+  }
+  .glass {
+    @apply border border-white/60 bg-white/50 backdrop-blur-md;
+  }
+}
+
+/* ---------------------------------------------------------------- header */
+
+.skip {
+  position: fixed;
+  left: 1rem;
+  top: -4rem;
+  z-index: 100;
+  @apply bg-ink px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-paper;
+}
+.skip:focus {
+  top: 1rem;
+}
+
+/* white, inverted against whatever room is behind it */
+.site-head {
+  color: #fff;
+  mix-blend-mode: difference;
+}
+.head-brand {
+  font-family: var(--f-display);
+  font-weight: 800;
+  font-size: 1.02rem;
+  letter-spacing: -0.045em;
+  text-transform: lowercase;
+}
+.head-brand span {
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+.head-link {
+  @apply inline-flex items-baseline gap-2;
+  font-weight: 600;
+  font-size: 0.66rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  padding-bottom: 2px;
+  transition: background-size 0.5s var(--ease);
+}
+.head-link .num {
+  font-size: 0.7rem;
+  letter-spacing: 0;
+}
+.head-link:hover,
+.head-link[data-current] {
+  background-size: 100% 1px;
+}
+
+.sound-bars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 9px;
+}
+.sound-bars i {
+  width: 2px;
+  height: 3px;
+  background: currentColor;
+}
+.sound-bars.is-on i {
+  animation: bar 1.1s ease-in-out infinite alternate;
+}
+.sound-bars.is-on i:nth-child(2) {
+  animation-delay: -0.4s;
+}
+.sound-bars.is-on i:nth-child(3) {
+  animation-delay: -0.8s;
+}
+@keyframes bar {
+  to {
+    height: 9px;
+  }
+}
+
+.menu-sheet {
+  background: var(--paper);
+  color: var(--ink);
+  animation: sheet 0.45s var(--ease);
+}
+.menu-link {
+  @apply flex items-baseline gap-4 border-b border-line py-3;
+  font-family: var(--f-display);
+  font-weight: 800;
+  font-size: clamp(2.3rem, 11vw, 3.2rem);
+  line-height: 0.9;
+  letter-spacing: -0.06em;
+  text-transform: uppercase;
+}
+.menu-link[data-current] {
+  font-weight: 400;
+}
+@keyframes sheet {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ---------------------------------------------------------------- scenes */
+
+.scene {
+  isolation: isolate;
+}
+.scene-wait {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.16) 1px, transparent 1px);
+  background-size: 22px 22px;
+  animation: breathe 2.6s ease-in-out infinite alternate;
+}
+@keyframes breathe {
+  to {
+    opacity: 0.75;
+  }
+}
+.scene-draft {
+  filter: blur(10px) brightness(1.08);
+  transform: scale(1.06);
+  animation: draft 0.9s var(--ease) both;
+}
+@keyframes draft {
+  from {
+    opacity: 0;
+  }
+}
+.scene-img {
+  animation: develop 1.4s var(--ease) both;
+}
+@keyframes develop {
+  from {
+    opacity: 0;
+    filter: brightness(1.6) saturate(0.4);
+  }
+}
+.scene-tag {
+  position: absolute;
+  left: 10px;
+  top: 8px;
+  @apply text-[0.6rem] font-bold uppercase tracking-[0.22em] text-white/80;
+  mix-blend-mode: difference;
+}
+
+.hero-fade {
+  background: linear-gradient(to top, rgba(236, 238, 235, 0.88) 0%, rgba(236, 238, 235, 0.45) 30%, rgba(236, 238, 235, 0) 58%);
+}
+.contact-fade {
+  background: linear-gradient(to top, rgba(236, 238, 235, 0.9) 0%, rgba(236, 238, 235, 0.55) 32%, rgba(236, 238, 235, 0) 62%);
+}
+
+.shot {
+  background: var(--paper-2);
+}
+.shot img {
+  transition: transform 1.2s var(--ease), filter 1.2s var(--ease);
+}
+
+/* ---------------------------------------------------------------- board */
+
+.board {
+  columns: 1;
+  column-gap: 1.25rem;
+}
+@media (min-width: 640px) {
+  .board {
+    columns: 2;
+  }
+}
+@media (min-width: 1024px) {
+  .board {
+    columns: 3;
+    column-gap: 1.5rem;
+  }
+}
+@media (min-width: 1360px) {
+  .board {
+    columns: 4;
+  }
+}
+.pin {
+  break-inside: avoid;
+  margin-bottom: 2.25rem;
+}
+.pin-cap {
+  @apply mt-3 block text-[0.86rem] leading-snug text-ink-soft;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.pin-cap > span:first-child {
+  @apply mr-2 text-ink;
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 0.74rem;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+.pin-link .scene,
+.pin-link .shot,
+.pin-link .note {
+  transition: filter 0.6s var(--ease), transform 0.8s var(--ease);
+}
+.pin-link:hover .scene,
+.pin-link:hover .shot {
+  filter: brightness(1.06) contrast(0.96);
+}
+.pin-link:hover .shot img {
+  transform: scale(1.025);
+}
+.pin-link:hover .pin-cap {
+  @apply text-ink;
+}
+.note {
+  @apply bg-paper-2 p-7;
+  border: 1px solid var(--line);
+}
+.note-dark {
+  background: #1d2a2b;
+  border-color: #1d2a2b;
+  color: #e9efec;
+}
+
+/* ---------------------------------------------------------------- pages */
+
+.work-media .shot img,
+.work-media .scene {
+  transition: transform 1.2s var(--ease), filter 1.2s var(--ease);
+}
+.work-media:hover .shot img {
+  transform: scale(1.02);
+}
+
+.meta > div {
+  @apply border-t border-line py-4;
+}
+
+.schematic {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  border-top: 1px solid var(--line);
+}
+.schematic li {
+  position: relative;
+  padding: 1rem 1rem 1rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.schematic li + li::before {
+  content: '→';
+  position: absolute;
+  left: -1.1rem;
+  top: 1rem;
+  @apply text-[0.8rem] text-ink-faint;
+}
+.schematic li + li {
+  padding-left: 0;
+  margin-left: 1.4rem;
+}
+
+.lane-row,
+.contact-row,
+.archive-row,
+.next-link {
+  transition: padding 0.5s var(--ease), background-color 0.4s;
+}
+.lane-row:hover,
+.archive-row:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+.contact-row:hover {
+  padding-left: 0.5rem;
+}
+.next-link:hover .t-m,
+.lane-row:hover .t-m,
+.contact-row:hover .t-s {
+  font-weight: 400;
+}
+
+/* ---------------------------------------------------------------- motion */
+
+.rise {
+  animation: rise 1.2s var(--ease) both;
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+.page {
+  transition: opacity 0.28s ease;
+}
+.page-out {
+  opacity: 0;
+}
+.page-in {
+  animation: page-in 0.52s var(--ease);
+}
+@keyframes page-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* between pages, the light overexposes for a moment */
+.flash {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 45%, #fbfdfc, #e9efed);
+  opacity: 0;
+  transition: opacity 0.28s ease;
+}
+.flash-out {
+  opacity: 0.85;
+}
+.flash-in {
+  opacity: 0;
+  transition-duration: 0.52s;
+}
+
+.grain {
+  position: fixed;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  pointer-events: none;
+  z-index: 85;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.14 0 0 0 0 0.15 0 0 0 1.1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  animation: grain 1.2s steps(6) infinite;
+}
+@keyframes grain {
+  0% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(-4%, 3%);
+  }
+  40% {
+    transform: translate(3%, -5%);
+  }
+  60% {
+    transform: translate(-2%, 4%);
+  }
+  80% {
+    transform: translate(5%, 1%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .grain {
+    display: none;
+  }
+}

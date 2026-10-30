@@ -1,74 +1,77 @@
-# Guitges — Portfolio
+# Baihaqi.exe
 
-Portfolio of **Guitges** (Ahmad Baihaqi): landing pages and informational websites for a
-one-time price. The site itself uses playful GSAP motion (inspired by gsap.com) to stand out.
+The portfolio of **Ahmad Baihaqi** (Guitges), a full-stack developer in Malaysia, built as a
+small, slightly impossible personal computer from 2003: a Frutiger Aero sky, desktop icons, real
+draggable windows, a taskbar and a Start menu. The desktop *is* the homepage.
 
-- `frontend/` — React + TypeScript + Vite + Tailwind CSS, animated with GSAP
-  (ScrollTrigger, ScrollSmoother, SplitText, Draggable + Inertia)
-- `frontend/api/` — Vercel Functions for the portfolio projects admin (stored in Vercel Blob)
-- `backend/` — the old Express API (contact form + AI concept tool), no longer used by the site
-- `assets/` — source logo files
+A recruiter can get everything in a few clicks: the welcome dialog has shortcuts to Projects,
+Experience, Résumé and Contact, and every app is reachable from the Start menu and My Computer.
 
-## Editing content
+## The computer
 
-Most copy lives in `frontend/src/lib/content.ts`: intro, about text, stats, skills, services,
-pricing (in RM) and your WhatsApp number. WhatsApp is the only contact method: the contact
-form just drafts a message and opens a WhatsApp chat.
+| App | What it holds |
+| --- | --- |
+| **My Computer** | Explorer-style navigation: Back/Forward/Up, Search, an address bar and folders for About Me, Projects, Skills, Experience and Contact |
+| **About Baihaqi** | Profile, education, certifications (About / System Information / Fun Facts tabs) |
+| **Projects** | Every project as a file: tiles, thumbnails, icons or details view, sorting, a preview pane; each opens its own details window |
+| **Skills and Components** | Skills by tab, labelled by where they were used (professional / projects / familiar), not by score |
+| **Work History** | Positions in a list view with expandable details and a link to the résumé PDF |
+| **Internet Explorer** | A tiny homepage, a contact page and a guestbook that lives only in the visitor's browser |
+| **Recycle Bin** | Fictional bad ideas, an Empty button, and something you were told not to open |
+| **Command Prompt** | A simulated prompt (`help`, `projects`, `skills`, `open <app>`, `theme <name>`…). Nothing typed is executed |
+| **Notepad** | Edit, save as `.txt`, unsaved-changes warning |
+| **System Properties** | Wallpapers, three themes (Classic XP Blue, Silver Millennium, Dreamy Sky), icon size, sound |
 
-## Managing your portfolio (/admin)
+Right-click (or long-press) the desktop for View, Sort, Refresh, New, Display Properties and
+About this computer. Log Off returns to the welcome dialog; Shut Down shows a screen with Restart.
 
-The "Sites I've built" section is managed from a small admin page, no code edits needed.
-Its API runs as Vercel Functions (`frontend/api/`) and stores everything in Vercel Blob.
-
-1. Set `ADMIN_PASSWORD` in the Vercel project (Settings → Environment Variables, or
-   `npx vercel env add ADMIN_PASSWORD production` inside `frontend/`), then redeploy.
-2. Open `https://<your-site>/admin` and log in.
-3. Add a site: paste its live link, a title, type, year, a short description and tags.
-   A screenshot of the site's first screen (1440×900) is captured automatically using
-   [Microlink](https://microlink.io)'s free API (about 50 screenshots/day).
-4. Edit, reorder, refresh a preview (e.g. after the client's site changes) or delete sites
-   from the same page.
-
-Each project is stored as its own JSON file in Blob under `portfolio/projects/`, and
-previews under `portfolio/screenshots/`.
-
-## What moves
-
-- Loader that counts to 100% and wipes away into the hero intro
-- Hero: SplitText character reveals, spinning inline shapes, pointer-parallax floaters
-- Skill marquees that speed up and flip direction with your scroll
-- About paragraph that lights up word by word as you scroll
-- Pinned horizontal project gallery with tilt-on-hover cards (desktop)
-- Stacking service cards that shrink as the next one slides over
-- One-time pricing cards that pop in
-- Playground of draggable, throwable shapes
-- Custom cursor, magnetic buttons, bouncy footer wordmark
-
-Animations respect `prefers-reduced-motion`.
+Easter eggs: the `secret` command, poking the Recycle Bin five times, `do_not_open.exe`, an
+occasional pixel fish, tray balloons, and the uptime in About this computer.
 
 ## Running locally
 
 ```bash
 cd frontend
 npm install
-npx vercel dev      # site + /api functions on http://localhost:3000
+npm run dev        # http://localhost:5173
+npm run build      # type-check + production build
+npm run lint
 ```
 
-`npx vercel dev` pulls the project's environment (including the Blob token) from Vercel, so
-the local admin edits your real portfolio. To use the local admin, add
-`ADMIN_PASSWORD=...` to `frontend/.env.local`. Plain `npm run dev` also works for the site
-itself, but `/api` (and the "Sites I've built" list) only works under `vercel dev`.
+In development `/api` is proxied to the live site (see `vite.config.ts`), so the project list
+includes the sites added through `/admin`.
 
-The old Express `backend/` (contact form + AI concept tool) is no longer used by the site.
+## Where things live
 
-## Environment variables (Vercel project)
-
-| Variable | Purpose |
+| Path | What |
 | --- | --- |
-| `ADMIN_PASSWORD` | Password for the `/admin` page. Admin is disabled while it's unset |
-| `BLOB_READ_WRITE_TOKEN` | Added automatically when the Blob store is connected |
+| `frontend/src/data/site.ts` | Everything a visitor reads: profile, links, education, skills, experience, notes, Recycle Bin jokes, tray balloons |
+| `frontend/src/data/projects.ts` | Projects: summary, problem, implementation, stack, links, source |
+| `frontend/src/os/store.tsx` | The window manager (one reducer) plus desktop state and persisted settings |
+| `frontend/src/os/registry.ts` | Each app's title, icon and default size |
+| `frontend/src/os/WindowFrame.tsx` | Title bar, controls, drag, resize, minimise/maximise |
+| `frontend/src/os/apps/` | One file per app |
+| `frontend/src/os/os.css` | All styling; theme tokens live on `.os-theme-*` |
+| `frontend/src/os/icons.tsx` | The hand-drawn SVG icon set |
+
+Only verified facts are used (from the résumé in `public/resume.pdf`). Missing links are simply
+hidden: set any link in `site.ts` to `''` to remove it everywhere.
+
+## Notes
+
+- Sound is off on every visit and only plays after the visitor turns it on (synthesised with the
+  Web Audio API; there are no audio files).
+- Settings live in `localStorage`; the welcome dialog is shown once per browser session.
+- `prefers-reduced-motion` turns off cloud drift, the fish and window animations.
+- On phones (< 640 px) icons open with a single tap and windows open near full-screen.
+
+## Admin (/admin)
+
+`/admin` manages an extra list of shipped sites in Vercel Blob (`ADMIN_PASSWORD` +
+`BLOB_READ_WRITE_TOKEN` in the Vercel project; run with `npx vercel dev`). Those sites appear in
+Projects next to the hand-written entries; a site already in `projects.ts` keeps its fuller entry.
 
 ## Deployment
 
-Deploy `frontend/` to Vercel (`npx vercel --prod` from `frontend/`). Vite is detected
-automatically, `api/` becomes Vercel Functions, and `vercel.json` routes `/admin` to the app.
+Deploy `frontend/` to Vercel (`npx vercel --prod` from `frontend/`). `vercel.json` routes every
+path to the app, and sets long-lived caching for hashed assets.

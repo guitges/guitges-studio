@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { ArrowDown, ArrowUp, ExternalLink, ImageOff, Loader2, LogOut, Pencil, RefreshCw, Trash2 } from 'lucide-react'
 import { admin, fetchProjects, imageUrl, type Project, type ProjectInput } from '../lib/api'
-import logoIcon from '../assets/guitges-icon.png'
+import './admin.css'
 
 const PW_KEY = 'guitges-admin-pw'
 const categories = ['Landing page', 'Informational website', 'Company profile', 'Other']
@@ -36,7 +36,7 @@ export default function Admin() {
   const [authed, setAuthed] = useState(false)
 
   useEffect(() => {
-    document.title = 'Admin — Guitges'
+    document.title = 'the back office · somewhere, not here.'
     if (!pw) return
     admin
       .login(pw)
@@ -56,7 +56,11 @@ export default function Admin() {
   }
 
   return (
-    <div className="min-h-screen bg-ink text-cream">
+    <div
+      className="relative min-h-screen font-sans text-ink"
+      style={{ background: 'linear-gradient(180deg, #B3BDD1 0%, #C4CADB 45%, #D7D2EA 100%)' }}
+    >
+      <div className="grain" aria-hidden="true" />
       {authed ? (
         <Dashboard pw={pw} onLogout={logout} />
       ) : (
@@ -93,25 +97,33 @@ function Login({ onSuccess }: { onSuccess: (pw: string) => void }) {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
-      <form onSubmit={submit} className="w-full max-w-sm rounded-[2rem] border border-cream/10 bg-ink-900 p-8">
-        <img src={logoIcon} alt="" className="h-12 w-12" />
-        <h1 className="mt-6 font-display text-3xl font-extrabold tracking-tight">Portfolio admin</h1>
-        <p className="mt-1 text-sm text-cream-muted">Manage the sites shown on your portfolio.</p>
+      <form onSubmit={submit} className="glass w-full max-w-sm rounded-sm p-8 shadow-window">
+        <p className="sys">staff only · room 000</p>
+        <h1 className="mt-4 font-serif text-5xl leading-none text-ink">The back office.</h1>
+        <p className="mt-3 font-sans text-[0.72rem] tracking-[0.06em] text-ink-soft">
+          the guest ledger is kept here. you’ll need the key.
+        </p>
         <label className="mt-8 block">
-          <span className="mb-2 block font-mono text-xs uppercase tracking-widest text-cream-dim">Password</span>
+          <span className="sys mb-2 block">key</span>
           <input
             type="password"
             required
             autoFocus
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            className="field"
+            className="field-dream"
           />
         </label>
-        {error && <p className="mt-3 text-sm text-tangerine">{error}</p>}
-        <button type="submit" disabled={busy} className="pill-lime mt-6 w-full disabled:opacity-60">
-          {busy ? <Loader2 size={18} className="animate-spin" /> : 'Log in'}
+        {error && <p className="mt-3 font-sans text-xs text-[#8A3F3A]">// {error.toLowerCase()}</p>}
+        <button type="submit" disabled={busy} className="link-sys mt-6 w-full justify-center disabled:opacity-60">
+          {busy ? <Loader2 size={16} className="animate-spin" /> : '[ unlock ]'}
         </button>
+        <a
+          href="/"
+          className="mt-6 block text-center font-sans text-[0.66rem] uppercase tracking-[0.14em] text-ink-faint hover:text-ink"
+        >
+          ← back to the water
+        </a>
       </form>
     </div>
   )
@@ -147,7 +159,10 @@ function Dashboard({ pw, onLogout }: { pw: string; onLogout: () => void }) {
       const res = editingId ? await admin.update(pw, editingId, form) : await admin.create(pw, form)
       setNotice(
         res.screenshotError
-          ? { kind: 'error', text: `Saved, but the preview couldn't be captured: ${res.screenshotError}. Try “Refresh preview” later.` }
+          ? {
+              kind: 'error',
+              text: `Saved, but the preview couldn't be captured: ${res.screenshotError}. Try “Refresh preview” later.`,
+            }
           : { kind: 'ok', text: editingId ? 'Changes saved.' : 'Site added to your portfolio.' },
       )
       setForm(blank)
@@ -162,7 +177,14 @@ function Dashboard({ pw, onLogout }: { pw: string; onLogout: () => void }) {
 
   function startEdit(p: Project) {
     setEditingId(p.id)
-    setForm({ title: p.title, url: p.url, category: p.category, year: p.year, description: p.description, tags: p.tags.join(', ') })
+    setForm({
+      title: p.title,
+      url: p.url,
+      category: p.category,
+      year: p.year,
+      description: p.description,
+      tags: p.tags.join(', '),
+    })
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
@@ -204,7 +226,12 @@ function Dashboard({ pw, onLogout }: { pw: string; onLogout: () => void }) {
     next.splice(index + dir, 0, item)
     setProjects(next)
     try {
-      setProjects(await admin.reorder(pw, next.map((p) => p.id)))
+      setProjects(
+        await admin.reorder(
+          pw,
+          next.map((p) => p.id),
+        ),
+      )
     } catch (err) {
       reportError(err)
       load()
@@ -218,84 +245,87 @@ function Dashboard({ pw, onLogout }: { pw: string; onLogout: () => void }) {
 
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-8">
-      <header className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <img src={logoIcon} alt="" className="h-10 w-10" />
-          <div>
-            <h1 className="font-display text-2xl font-extrabold tracking-tight">Portfolio admin</h1>
-            <p className="text-sm text-cream-muted">Sites shown in “Sites I’ve built”.</p>
-          </div>
+      <header className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="sys">room 000 · the back office · 03:17 am</p>
+          <h1 className="mt-3 font-serif text-5xl leading-none text-ink sm:text-6xl">The guest ledger.</h1>
+          <p className="mt-3 font-sans text-[0.72rem] tracking-[0.06em] text-ink-soft">
+            every site that has stayed here. sign them in, tidy them up, let them check out.
+          </p>
         </div>
         <div className="flex gap-2">
-          <a href="/" className="pill-ghost !px-4 !py-2 text-sm">
-            <ExternalLink size={16} /> View site
+          <a href="/" className="link-sys">
+            <ExternalLink size={14} /> the site
           </a>
-          <button onClick={onLogout} className="pill-ghost !px-4 !py-2 text-sm">
-            <LogOut size={16} /> Log out
+          <button onClick={onLogout} className="link-sys">
+            <LogOut size={14} /> lock up
           </button>
         </div>
       </header>
 
       {notice && (
         <p
-          className={`mt-8 rounded-2xl px-5 py-4 text-sm ${
-            notice.kind === 'ok' ? 'bg-lime/15 text-lime' : 'bg-tangerine/15 text-tangerine'
+          role="status"
+          className={`mt-8 rounded-sm border px-4 py-3 font-sans text-xs ${
+            notice.kind === 'ok'
+              ? 'border-[#4F8F78]/30 bg-[#E3F0EA]/80 text-[#2E5F4E]'
+              : 'border-[#A0524C]/30 bg-[#F4E4E2]/80 text-[#7A3A35]'
           }`}
         >
-          {notice.text}
+          // {notice.text}
         </p>
       )}
 
-      <form onSubmit={submit} className="mt-8 grid gap-5 rounded-[2rem] border border-cream/10 bg-ink-900 p-6 sm:grid-cols-2 sm:p-8">
-        <h2 className="font-display text-xl font-bold sm:col-span-2">{editingId ? 'Edit site' : 'Add a site'}</h2>
+      <form onSubmit={submit} className="glass mt-8 grid gap-5 rounded-sm p-6 shadow-window sm:grid-cols-2 sm:p-8">
+        <h2 className="font-serif text-3xl text-ink sm:col-span-2">
+          {editingId ? 'Amend an entry.' : 'Sign a new guest in.'}
+        </h2>
         <label className="block sm:col-span-2">
-          <span className="mb-2 block font-mono text-xs uppercase tracking-widest text-cream-dim">Link to the live site</span>
-          <input required type="url" placeholder="https://yourclient.com" className="field" {...field('url')} />
+          <span className="sys mb-2 block">Link to the live site</span>
+          <input required type="url" placeholder="https://yourclient.com" className="field-dream" {...field('url')} />
         </label>
         <label className="block">
-          <span className="mb-2 block font-mono text-xs uppercase tracking-widest text-cream-dim">Title</span>
-          <input required maxLength={80} placeholder="Kedai Kopi Aisyah" className="field" {...field('title')} />
+          <span className="sys mb-2 block">Title</span>
+          <input required maxLength={80} placeholder="Kedai Kopi Aisyah" className="field-dream" {...field('title')} />
         </label>
         <div className="grid grid-cols-[1fr_6rem] gap-3">
           <label className="block">
-            <span className="mb-2 block font-mono text-xs uppercase tracking-widest text-cream-dim">Type</span>
-            <select className="field" {...field('category')}>
+            <span className="sys mb-2 block">Type</span>
+            <select className="field-dream" {...field('category')}>
               {categories.map((c) => (
-                <option key={c} className="bg-ink-900">
-                  {c}
-                </option>
+                <option key={c}>{c}</option>
               ))}
             </select>
           </label>
           <label className="block">
-            <span className="mb-2 block font-mono text-xs uppercase tracking-widest text-cream-dim">Year</span>
-            <input maxLength={4} inputMode="numeric" className="field" {...field('year')} />
+            <span className="sys mb-2 block">Year</span>
+            <input maxLength={4} inputMode="numeric" className="field-dream" {...field('year')} />
           </label>
         </div>
         <label className="block sm:col-span-2">
-          <span className="mb-2 block font-mono text-xs uppercase tracking-widest text-cream-dim">Short description</span>
+          <span className="sys mb-2 block">Short description</span>
           <textarea
             rows={2}
             maxLength={240}
             placeholder="What the site does for the client, in one sentence."
-            className="field resize-none"
+            className="field-dream resize-none"
             {...field('description')}
           />
         </label>
         <label className="block sm:col-span-2">
-          <span className="mb-2 block font-mono text-xs uppercase tracking-widest text-cream-dim">Tags (comma separated)</span>
-          <input placeholder="1 page, WhatsApp button, SEO" className="field" {...field('tags')} />
+          <span className="sys mb-2 block">Tags (comma separated)</span>
+          <input placeholder="1 page, WhatsApp button, SEO" className="field-dream" {...field('tags')} />
         </label>
         <div className="flex flex-wrap items-center gap-3 sm:col-span-2">
-          <button type="submit" disabled={saving} className="pill-lime disabled:opacity-60">
+          <button type="submit" disabled={saving} className="link-sys disabled:opacity-60">
             {saving ? (
               <>
-                <Loader2 size={18} className="animate-spin" /> Saving & capturing preview…
+                <Loader2 size={14} className="animate-spin" /> saving & taking a photograph…
               </>
             ) : editingId ? (
-              'Save changes'
+              '[ save changes ]'
             ) : (
-              'Add site'
+              '[ sign in ]'
             )}
           </button>
           {editingId && (
@@ -305,60 +335,82 @@ function Dashboard({ pw, onLogout }: { pw: string; onLogout: () => void }) {
                 setEditingId(null)
                 setForm(blank)
               }}
-              className="pill-ghost"
+              className="link-sys"
             >
-              Cancel
+              cancel
             </button>
           )}
-          <p className="text-xs text-cream-dim">
-            A screenshot of the site’s first screen is taken automatically — this can take up to 30 seconds.
+          <p className="font-sans text-[0.68rem] text-ink-faint">
+            a photograph of the site’s first screen is taken automatically. it can take up to 30 seconds.
           </p>
         </div>
       </form>
 
       <section className="mt-10">
-        <h2 className="font-display text-xl font-bold">Your sites ({projects.length})</h2>
-        {projects.length === 0 && <p className="mt-4 text-cream-muted">No sites yet — add your first one above.</p>}
+        <h2 className="sys">guests currently staying · {String(projects.length).padStart(2, '0')}</h2>
+        {projects.length === 0 && (
+          <p className="mt-4 font-sans text-xs text-ink-soft">the ledger is empty. there is no one else here.</p>
+        )}
         <ul className="mt-4 space-y-3">
           {projects.map((p, i) => {
             const src = imageUrl(p)
             const busy = busyId === p.id
             return (
-              <li key={p.id} className="flex flex-col gap-4 rounded-3xl border border-cream/10 bg-ink-900 p-4 sm:flex-row sm:items-center">
-                <div className="aspect-[16/10] w-full shrink-0 overflow-hidden rounded-xl bg-ink-800 sm:w-44">
-                  {src ? (
-                    <img src={src} alt="" className="h-full w-full object-cover object-top" />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-cream-dim">
-                      <ImageOff size={22} />
-                    </div>
-                  )}
+              <li
+                key={p.id}
+                className="overflow-hidden rounded-md border border-white/70 bg-mist/80 shadow-window backdrop-blur-md"
+              >
+                <div className="flex items-center justify-between border-b border-ink/10 bg-white/50 px-3 py-1.5">
+                  <span className="font-sans text-[0.66rem] tracking-[0.06em] text-ink-soft">
+                    guest_{String(i + 1).padStart(2, '0')} — {p.title.toLowerCase().replace(/\s+/g, '_')}
+                  </span>
+                  <span className="flex gap-1" aria-hidden="true">
+                    {[0, 1, 2].map((k) => (
+                      <span key={k} className="h-2 w-2 border border-ink/30" />
+                    ))}
+                  </span>
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="font-display text-lg font-bold">{p.title}</p>
-                  <a href={p.url} target="_blank" rel="noreferrer" className="block truncate text-sm text-cream-muted hover:text-lime">
-                    {p.url}
-                  </a>
-                  <p className="mt-1 font-mono text-xs uppercase tracking-widest text-cream-dim">
-                    {p.category} · {p.year}
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  <IconButton label="Move up" disabled={i === 0} onClick={() => move(i, -1)}>
-                    <ArrowUp size={16} />
-                  </IconButton>
-                  <IconButton label="Move down" disabled={i === projects.length - 1} onClick={() => move(i, 1)}>
-                    <ArrowDown size={16} />
-                  </IconButton>
-                  <IconButton label="Edit" onClick={() => startEdit(p)}>
-                    <Pencil size={16} />
-                  </IconButton>
-                  <IconButton label="Refresh preview" disabled={busy} onClick={() => refresh(p)}>
-                    <RefreshCw size={16} className={busy ? 'animate-spin' : ''} />
-                  </IconButton>
-                  <IconButton label="Delete" disabled={busy} onClick={() => remove(p)} danger>
-                    <Trash2 size={16} />
-                  </IconButton>
+                <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
+                  <div className="aspect-[16/10] w-full shrink-0 overflow-hidden rounded-sm bg-lavender/40 sm:w-44">
+                    {src ? (
+                      <img src={src} alt="" className="h-full w-full object-cover object-top" />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-ink-faint">
+                        <ImageOff size={22} />
+                      </div>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-serif text-2xl leading-tight text-ink">{p.title}</p>
+                    <a
+                      href={p.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block truncate font-sans text-xs text-ink-soft underline decoration-ink/20 underline-offset-4 hover:text-ink"
+                    >
+                      {p.url}
+                    </a>
+                    <p className="sys mt-1.5">
+                      {p.category} · {p.year}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    <IconButton label="Move up" disabled={i === 0} onClick={() => move(i, -1)}>
+                      <ArrowUp size={16} />
+                    </IconButton>
+                    <IconButton label="Move down" disabled={i === projects.length - 1} onClick={() => move(i, 1)}>
+                      <ArrowDown size={16} />
+                    </IconButton>
+                    <IconButton label="Edit" onClick={() => startEdit(p)}>
+                      <Pencil size={16} />
+                    </IconButton>
+                    <IconButton label="Refresh preview" disabled={busy} onClick={() => refresh(p)}>
+                      <RefreshCw size={16} className={busy ? 'animate-spin' : ''} />
+                    </IconButton>
+                    <IconButton label="Delete" disabled={busy} onClick={() => remove(p)} danger>
+                      <Trash2 size={16} />
+                    </IconButton>
+                  </div>
                 </div>
               </li>
             )
@@ -389,8 +441,10 @@ function IconButton({
       aria-label={label}
       disabled={disabled}
       onClick={onClick}
-      className={`flex h-10 w-10 items-center justify-center rounded-full border border-cream/15 transition-colors disabled:opacity-30 ${
-        danger ? 'hover:border-tangerine hover:bg-tangerine hover:text-ink' : 'hover:border-cream hover:bg-cream hover:text-ink'
+      className={`flex h-9 w-9 items-center justify-center rounded-sm border border-ink/20 bg-white/50 text-ink transition-colors disabled:opacity-30 ${
+        danger
+          ? 'hover:border-[#A0524C] hover:bg-[#A0524C] hover:text-mist'
+          : 'hover:border-ink hover:bg-ink hover:text-mist'
       }`}
     >
       {children}
